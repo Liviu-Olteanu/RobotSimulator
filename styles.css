@@ -1,0 +1,39 @@
+h1 {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#dashboard-icon {
+  width: 40px;
+  height: auto;
+  vertical-align: middle;
+  margin-bottom: 5px;
+}
+
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+body {
+  background-color: rgb(243, 243, 230);
+}
+
+.status-cards {
+  display: flex;
+  justify-content: space-between;
+  margin-inline: 200px;
+}
+
+.card {
+  padding: 24px;
+  width: 220px;
+  border-radius: 12px;
+  background-color: #ececd1;
+
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 16px;
+  color: #555555;
+
+  border: 1px solid #eaeaea;
+}
