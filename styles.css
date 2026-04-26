@@ -37,3 +37,32 @@ body {
 
   border: 1px solid #eaeaea;
 }
+
+.progress-track {
+  width: 100%;
+  height: 4px;
+  background-color: #daddd8;
+  border-radius: 2px;
+}
+
+.progress-fill-battery-green {
+  height: 100%;
+  background-color: #34a87c;
+  border-radius: 2px;
+  width: 72%;
+}
+
+.card-value {
+  color: #34a87c;
+  font-size: 30px;
+  padding-bottom: 10px;
+}
+
+.green-button {
+  padding-left: 5%;
+  color: #34a87c;
+}
+
+.green-button li::marker {
+  color: #34a87c;
+}
