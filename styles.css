@@ -16,7 +16,7 @@ h1 {
 }
 
 body {
-  background-color: rgb(243, 243, 230);
+  background-color: rgb(245, 245, 245);
 }
 
 .status-cards {
@@ -26,10 +26,10 @@ body {
 }
 
 .card {
-  padding: 24px;
+  padding: 20px;
   width: 220px;
   border-radius: 12px;
-  background-color: #ececd1;
+  background-color: #ebebeb;
 
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   font-size: 16px;
@@ -45,6 +45,23 @@ body {
   border-radius: 2px;
 }
 
+.motors-speed-card {
+  font-size: 30px;
+  font-weight: 500;
+}
+
+.temperature-card {
+  font-size: 30px;
+  font-weight: 500;
+}
+
+.motor-status-card {
+  font-weight: 500;
+  font-size: 18px;
+}
+
+/* full battery*/
+
 .progress-fill-battery-green {
   height: 100%;
   background-color: #34a87c;
@@ -52,11 +69,13 @@ body {
   width: 72%;
 }
 
-.card-value {
+.battery-card-value {
   color: #34a87c;
   font-size: 30px;
   padding-bottom: 10px;
 }
+
+/* running motor */
 
 .green-button {
   padding-left: 5%;
@@ -65,4 +84,77 @@ body {
 
 .green-button li::marker {
   color: #34a87c;
+}
+
+/* low battery */
+
+.progress-fill-battery-red {
+  height: 100%;
+  background-color: #a83434;
+  border-radius: 2px;
+  width: 72%;
+}
+
+.battery-card-value-red {
+  color: #a83434;
+  font-size: 30px;
+  padding-bottom: 10px;
+}
+
+/* Motor stopped */
+
+.gray-button {
+  padding-left: 5%;
+  color: #7c7c7c;
+}
+
+.gray-button li::marker {
+  color: #7c7c7c;
+}
+
+/* Battery mid level */
+
+.progress-fill-battery-orange {
+  height: 100%;
+  background-color: #d18d21;
+  border-radius: 2px;
+  width: 72%;
+}
+
+.battery-card-value-orange {
+  color: #d18d21;
+  font-size: 30px;
+  padding-bottom: 10px;
+}
+
+/* Charging Motor */
+
+.blue-button {
+  padding-left: 5%;
+  color: #007ad1;
+}
+
+.blue-button li::marker {
+  color: #007ad1;
+}
+
+/* Depleted motor battery / Overheated*/
+
+.red-button {
+  padding-left: 5%;
+  color: #d10007;
+}
+
+.red-button li::marker {
+  color: #d10007;
+}
+
+/* mid temperature level */
+
+.temperature-card-mid {
+  color: #d18d21;
+}
+
+.temperature-card-high {
+  color: #d10007;
 }
