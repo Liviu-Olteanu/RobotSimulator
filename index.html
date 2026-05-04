@@ -4,8 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="styles.css" />
+    <script src="script.js" defer></script>
   </head>
-  <body>
+  <body class="dashboard_container">
     <header class="header">
       <img src="RoboIcon.png" alt="dashboard-icon" class="header_icon" />
       <h1 class="header_title">Robot Telemetry Dashboard</h1>
@@ -34,6 +35,24 @@
           <div class="motor_status_card motor_status_card--running">
             <p><span class="circle circle--running"></span>Running</p>
           </div>
+        </div>
+      </section>
+      <section class="chart_layout">
+        <div class="chart_card motor_speed_chart">
+          <p>Motor speed over time</p>
+          <img
+            src="ChartPlaceholder.png"
+            alt="motor-speed-chart"
+            class="chart"
+          />
+        </div>
+        <div class="chart_card motor_speed_chart">
+          <p>Temperature over time</p>
+          <img
+            src="ChartPlaceholder.png"
+            alt="motor-speed-chart"
+            class="chart"
+          />
         </div>
       </section>
       <section class="control_panel">
