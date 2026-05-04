@@ -5,8 +5,8 @@
   --color-charging: #007ad1;
   --color-stopped: #7c7c7c;
 
-  --bg-main: rgb(245, 245, 245);
-  --bg-card: #ebebeb;
+  --bg-main: rgb(246, 242, 242);
+  --bg-card: rgb(255, 231, 231);
   --text-main: #555555;
 }
 
@@ -157,4 +157,45 @@ body {
 
 .circle--warning {
   background-color: var(--color-danger);
+}
+
+.control_panel {
+  margin-top: 2rem;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 12px 24px;
+  margin-inline: 2.5rem;
+}
+
+.control_panel h4 {
+  font-weight: normal;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.btn {
+  margin: auto 0.2rem auto 0.2rem;
+  padding: 12px 24px;
+  border-radius: 6px;
+  border: 1px solid #ebc9c9;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn_control--stop {
+  background-color: var(--color-danger);
+}
+
+.btn_control--start {
+  background-color: var(--color-full);
+}
+
+.btn_charge--ready {
+  background-color: whitesmoke;
+}
+
+.btn_charge--charging {
+  background-color: var(--color-charging);
 }
