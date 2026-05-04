@@ -1,160 +1,160 @@
-h1 {
+:root {
+  --color-full: #34a87c;
+  --color-mid: #d18d21;
+  --color-danger: #d10007;
+  --color-charging: #007ad1;
+  --color-stopped: #7c7c7c;
+
+  --bg-main: rgb(245, 245, 245);
+  --bg-card: #ebebeb;
+  --text-main: #555555;
+}
+
+* {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-#dashboard-icon {
-  width: 40px;
+.header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header_icon {
+  width: 2.5rem;
+  max-width: 100%;
   height: auto;
   vertical-align: middle;
   margin-bottom: 5px;
 }
 
-.dashboard-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
 body {
-  background-color: rgb(245, 245, 245);
+  background-color: var(--bg-main);
 }
 
-.status-cards {
+.status_cards {
   display: flex;
   justify-content: space-between;
-  margin-inline: 200px;
+  margin-inline: auto;
+  max-width: 1200px;
+  padding-inline: 1rem;
+}
+
+.status_cards h3 {
+  font-weight: normal;
 }
 
 .card {
   padding: 20px;
-  width: 220px;
+  width: 14rem;
+  max-width: 100%;
   border-radius: 12px;
-  background-color: #ebebeb;
+  background-color: var(--bg-card);
 
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  font-size: 16px;
-  color: #555555;
+  font-size: 1rem;
+  color: var(--text-main);
 
   border: 1px solid #eaeaea;
 }
 
-.progress-track {
+.battery_card {
+  font-size: 1.875rem;
+  padding-bottom: 10px;
+}
+
+.battery_card--charged {
+  color: var(--color-full);
+}
+
+.battery_card--mid {
+  color: var(--color-mid);
+}
+
+.battery_card--low {
+  color: var(--color-danger);
+}
+
+.progress_track {
   width: 100%;
   height: 4px;
   background-color: #daddd8;
   border-radius: 2px;
 }
 
-.motors-speed-card {
-  font-size: 30px;
-  font-weight: 500;
-}
-
-.temperature-card {
-  font-size: 30px;
-  font-weight: 500;
-}
-
-.motor-status-card {
-  font-weight: 500;
-  font-size: 18px;
-}
-
-/* full battery*/
-
-.progress-fill-battery-green {
+.progress_fill_battery {
   height: 100%;
-  background-color: #34a87c;
   border-radius: 2px;
   width: 72%;
 }
 
-.battery-card-value {
-  color: #34a87c;
-  font-size: 30px;
-  padding-bottom: 10px;
+.progress_fill_battery--charged {
+  background-color: var(--color-full);
 }
 
-/* running motor */
-
-.green-button {
-  padding-left: 5%;
-  color: #34a87c;
+.progress_fill_battery--mid {
+  background-color: var(--color-mid);
 }
 
-.green-button li::marker {
-  color: #34a87c;
+.progress_fill_battery--low {
+  background-color: var(--color-danger);
 }
 
-/* low battery */
-
-.progress-fill-battery-red {
-  height: 100%;
-  background-color: #a83434;
-  border-radius: 2px;
-  width: 72%;
+.motors_speed_card--value,
+.temperature_card {
+  font-size: 1.875rem;
+  font-weight: 500;
 }
 
-.battery-card-value-red {
-  color: #a83434;
-  font-size: 30px;
-  padding-bottom: 10px;
+.temperature_card--mid {
+  color: var(--color-mid);
 }
 
-/* Motor stopped */
-
-.gray-button {
-  padding-left: 5%;
-  color: #7c7c7c;
+.temperature_card--high {
+  color: var(--color-danger);
 }
 
-.gray-button li::marker {
-  color: #7c7c7c;
+.motor_status_card {
+  font-weight: 500;
+  font-size: 1.125rem;
 }
 
-/* Battery mid level */
-
-.progress-fill-battery-orange {
-  height: 100%;
-  background-color: #d18d21;
-  border-radius: 2px;
-  width: 72%;
+.motor_status_card--running {
+  color: var(--color-full);
 }
 
-.battery-card-value-orange {
-  color: #d18d21;
-  font-size: 30px;
-  padding-bottom: 10px;
+.motor_status_card--stopped {
+  color: var(--color-stopped);
 }
 
-/* Charging Motor */
-
-.blue-button {
-  padding-left: 5%;
-  color: #007ad1;
+.motor_status_card--charging {
+  color: var(--color-charging);
 }
 
-.blue-button li::marker {
-  color: #007ad1;
+.motor_status_card--warning {
+  color: var(--color-danger);
 }
 
-/* Depleted motor battery / Overheated*/
-
-.red-button {
-  padding-left: 5%;
-  color: #d10007;
+.circle {
+  height: 0.5rem;
+  width: 0.5rem;
+  margin-right: 6px;
+  background-color: #555;
+  border-radius: 50%;
+  display: inline-block;
 }
 
-.red-button li::marker {
-  color: #d10007;
+.circle--running {
+  background-color: var(--color-full);
 }
 
-/* mid temperature level */
-
-.temperature-card-mid {
-  color: #d18d21;
+.circle--stopped {
+  background-color: var(--color-stopped);
 }
 
-.temperature-card-high {
-  color: #d10007;
+.circle--charging {
+  background-color: var(--color-charging);
+}
+
+.circle--warning {
+  background-color: var(--color-danger);
 }

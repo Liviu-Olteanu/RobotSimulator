@@ -6,36 +6,36 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="dashboard-header">
-      <h1>
-        <img src="RoboIcon.png" alt="dashboard-icon" id="dashboard-icon" />
-        Robot Telemetry Dashboard
-      </h1>
-    </div>
-    <div class="status-cards">
-      <div class="card">
-        <p>Battery</p>
-        <p><span class="battery-card-value">72%</span></p>
-        <div class="progress-track">
-          <div class="progress-fill-battery-green"></div>
+    <header class="header">
+      <img src="RoboIcon.png" alt="dashboard-icon" class="header_icon" />
+      <h1 class="header_title">Robot Telemetry Dashboard</h1>
+    </header>
+    <main>
+      <section class="status_cards">
+        <div class="card">
+          <h3>Battery</h3>
+          <p><span class="battery_card battery_card--charged">72%</span></p>
+          <div class="progress_track">
+            <div
+              class="progress_fill_battery progress_fill_battery--charged"
+            ></div>
+          </div>
         </div>
-      </div>
-      <div class="card">
-        <p>Motor Speed</p>
-        <p><span class="motors-speed-card">1,134</span>RPM</p>
-      </div>
-      <div class="card">
-        <p>Temperature</p>
-        <p><span class="temperature-card">34</span>°C</p>
-      </div>
-      <div class="card">
-        <p>Motor Status</p>
-        <div class="motor-status-card">
-          <ul class="green-button">
-            <li>Running</li>
-          </ul>
+        <div class="card">
+          <h3>Motor Speed</h3>
+          <p><span class="motors_speed_card--value">1,134</span>RPM</p>
         </div>
-      </div>
-    </div>
+        <div class="card">
+          <h3>Temperature</h3>
+          <p><span class="temperature_card">34</span>°C</p>
+        </div>
+        <div class="card">
+          <h3>Motor Status</h3>
+          <div class="motor_status_card motor_status_card--running">
+            <p><span class="circle circle--running"></span>Running</p>
+          </div>
+        </div>
+      </section>
+    </main>
   </body>
 </html>
