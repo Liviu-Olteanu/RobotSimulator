@@ -1,0 +1,41 @@
+<html>
+  <head>
+    <title>RobotSimulator</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="header">
+      <img src="RoboIcon.png" alt="dashboard-icon" class="header_icon" />
+      <h1 class="header_title">Robot Telemetry Dashboard</h1>
+    </header>
+    <main>
+      <section class="status_cards">
+        <div class="card">
+          <h3>Battery</h3>
+          <p><span class="battery_card battery_card--charged">72%</span></p>
+          <div class="progress_track">
+            <div
+              class="progress_fill_battery progress_fill_battery--charged"
+            ></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Motor Speed</h3>
+          <p><span class="motors_speed_card--value">1,134</span>RPM</p>
+        </div>
+        <div class="card">
+          <h3>Temperature</h3>
+          <p><span class="temperature_card">34</span>°C</p>
+        </div>
+        <div class="card">
+          <h3>Motor Status</h3>
+          <div class="motor_status_card motor_status_card--running">
+            <p><span class="circle circle--running"></span>Running</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
