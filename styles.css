@@ -210,6 +210,10 @@ body {
   cursor: pointer;
 }
 
+.btn:disabled {
+  cursor: not-allowed;
+}
+
 .btn_control--stop {
   background-color: var(--color-danger);
 }
