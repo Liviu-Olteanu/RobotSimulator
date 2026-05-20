@@ -14,6 +14,7 @@
 
 * {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  box-sizing: border-box;
 }
 
 .dashboard_container {
@@ -41,8 +42,15 @@ body {
 }
 
 .status_cards {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
   gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .status_cards {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 .status_cards h3 {
@@ -51,7 +59,8 @@ body {
 
 .card {
   padding: 20px;
-  width: 14rem;
+  width: 100%;
+  max-width: 14rem;
   max-width: 100%;
   border-radius: 12px;
   background-color: var(--bg-card);
@@ -167,9 +176,15 @@ body {
 .chart_layout {
   margin-top: 1.5rem;
   display: flex;
+  flex-direction: column;
   gap: 1.5rem;
 }
 
+@media (min-width: 768px) {
+  .chart_layout {
+    flex-direction: row;
+  }
+}
 .chart_layout p {
   margin-top: 0.2rem;
 }
