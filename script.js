@@ -6,6 +6,12 @@ function onLoad() {
   const controlButton = document.querySelector(".btn_control");
   const chargeButton = document.querySelector(".btn_charge");
   const buttonStateText = document.querySelector(".button_state_text");
+  const batteryChargePercentage = document.querySelector(".battery_card");
+  let batteryCharge = 1;
+  let batteryCharging = null;
+  let batteryDepleting = null;
+
+  batteryChargePercentage.textContent = `${batteryCharge}%`;
 
   function toggleMotorButtonState() {
     if (!controlButton) {
@@ -13,22 +19,26 @@ function onLoad() {
       return;
     }
     if (controlButton.classList.contains(CLASS_CONTROL_BTN_STOP)) {
-      controlButton.classList.replace(
-        CLASS_CONTROL_BTN_STOP,
-        CLASS_CONTROL_BTN_START,
-      );
+      controlButton.classList.replace(CLASS_CONTROL_BTN_STOP, CLASS_CONTROL_BTN_START);
       controlButton.textContent = "Start motor";
-      buttonStateText.textContent =
-        "Motor is stopped. You can start motor or charge.";
+      clearInterval(batteryDepleting);
+      buttonStateText.textContent = "Motor is stopped. You can start motor or charge.";
       chargeButton.disabled = false;
     } else if (controlButton.classList.contains(CLASS_CONTROL_BTN_START)) {
-      controlButton.classList.replace(
-        CLASS_CONTROL_BTN_START,
-        CLASS_CONTROL_BTN_STOP,
-      );
+      controlButton.classList.replace(CLASS_CONTROL_BTN_START, CLASS_CONTROL_BTN_STOP);
       controlButton.textContent = "Stop motor";
-      buttonStateText.textContent =
-        "Motor is running. Stop motor before charging.";
+      batteryDepleting = setInterval(() => {
+        batteryCharge -= 1;
+        if (batteryCharge <= 0) {
+          batteryCharge = 0;
+          batteryChargePercentage.textContent = `${batteryCharge}%`;
+          buttonStateText.textContent = "The battery is fully depleted";
+          clearInterval(batteryDepleting);
+        } else {
+          batteryChargePercentage.textContent = `${batteryCharge.toFixed(1)}%`;
+        }
+      }, 10000);
+      buttonStateText.textContent = "Motor is running. Stop motor before charging.";
       chargeButton.disabled = true;
     } else {
       controlButton.classList.add(CLASS_BTN_STOP);
@@ -42,21 +52,27 @@ function onLoad() {
     }
     if (chargeButton.classList.contains(ClASS_BTN_CHARGE_READY)) {
       controlButton.disabled = true;
+      buttonStateText.textContent = `Charging... battery at ${batteryCharge.toFixed(1)}%`;
       chargeButton.textContent = "Stop charging";
-      chargeButton.classList.replace(
-        ClASS_BTN_CHARGE_READY,
-        ClASS_BTN_CHARGE_CHARGING,
-      );
-      buttonStateText.textContent = "Charging... battery at 72%";
+      chargeButton.classList.replace(ClASS_BTN_CHARGE_READY, ClASS_BTN_CHARGE_CHARGING);
+      batteryCharging = setInterval(() => {
+        batteryCharge += 0.1;
+        if (batteryCharge >= 100) {
+          batteryCharge = 100;
+          batteryChargePercentage.textContent = `${batteryCharge.toFixed(0)}%`;
+          buttonStateText.textContent = "The battery is fully charged.";
+          clearInterval(batteryCharging);
+        } else {
+          batteryChargePercentage.textContent = `${batteryCharge.toFixed(1)}%`;
+          buttonStateText.textContent = `Charging... battery at ${batteryCharge.toFixed(1)}%`;
+        }
+      }, 1000);
     } else if (chargeButton.classList.contains(ClASS_BTN_CHARGE_CHARGING)) {
       controlButton.disabled = false;
       chargeButton.textContent = "Charge";
-      chargeButton.classList.replace(
-        ClASS_BTN_CHARGE_CHARGING,
-        ClASS_BTN_CHARGE_READY,
-      );
-      buttonStateText.textContent =
-        "Motor is stopped. You can start motor or charge.";
+      chargeButton.classList.replace(ClASS_BTN_CHARGE_CHARGING, ClASS_BTN_CHARGE_READY);
+      clearInterval(batteryCharging);
+      buttonStateText.textContent = "Motor is stopped. You can start motor or charge.";
     } else {
       chargeButton.classList.add(ClASS_BTN_CHARGE_READY);
     }
