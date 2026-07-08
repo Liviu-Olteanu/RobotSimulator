@@ -17,9 +17,7 @@
           <h3>Battery</h3>
           <p><span class="battery_card battery_card--charged">72%</span></p>
           <div class="progress_track">
-            <div
-              class="progress_fill_battery progress_fill_battery--charged"
-            ></div>
+            <div class="progress_fill_battery progress_fill_battery--charged"></div>
           </div>
         </div>
         <div class="card">
@@ -33,37 +31,26 @@
         <div class="card">
           <h3>Motor Status</h3>
           <div class="motor_status_card motor_status_card--running">
-            <p><span class="circle circle--running"></span>Running</p>
+            <span class="circle circle--running"></span>
+            <span class="motor_status_text">Running</span>
           </div>
         </div>
       </section>
       <section class="chart_layout">
         <div class="chart_card motor_speed_chart">
           <p>Motor speed over time</p>
-          <img
-            src="ChartPlaceholder.png"
-            alt="motor-speed-chart"
-            class="chart"
-          />
+          <img src="ChartPlaceholder.png" alt="motor-speed-chart" class="chart" />
         </div>
         <div class="chart_card motor_speed_chart">
           <p>Temperature over time</p>
-          <img
-            src="ChartPlaceholder.png"
-            alt="motor-speed-chart"
-            class="chart"
-          />
+          <img src="ChartPlaceholder.png" alt="motor-speed-chart" class="chart" />
         </div>
       </section>
       <section class="control_panel">
         <h4>Control Panel</h4>
         <button class="btn btn_control btn_control--stop">Stop motor</button>
-        <button class="btn btn_charge btn_charge--ready" disabled>
-          Charge
-        </button>
-        <span class="button_state_text"
-          >Motor is running. Stop motor before charging.</span
-        >
+        <button class="btn btn_charge btn_charge--ready" disabled>Charge</button>
+        <span class="button_state_text">Motor is running. Stop motor before charging.</span>
       </section>
     </main>
   </body>

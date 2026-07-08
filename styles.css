@@ -155,7 +155,7 @@ body {
 .circle {
   height: 0.5rem;
   width: 0.5rem;
-  margin-right: 0.375rem;
+  margin-right: 0.2rem;
   background-color: #555;
   border-radius: 50%;
   display: inline-block;
