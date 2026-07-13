@@ -17,7 +17,7 @@
   box-sizing: border-box;
 }
 
-.dashboard_container {
+.dashboard-container {
   max-width: 75rem;
   margin-inline: auto;
   padding: 2rem;
@@ -29,7 +29,7 @@
   gap: 1rem;
 }
 
-.header_icon {
+.header__icon {
   width: 2.5rem;
   max-width: 100%;
   height: auto;
@@ -41,25 +41,25 @@ body {
   background-color: var(--bg-main);
 }
 
-.status_cards {
+.status-cards {
   display: grid;
   grid-template-columns: 1fr;
   gap: 1.5rem;
 }
 
 @media (min-width: 480px) {
-  .status_cards {
+  .status-cards {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (min-width: 768px) {
-  .status_cards {
+  .status-cards {
     grid-template-columns: repeat(4, 1fr);
   }
 }
 
-.status_cards h3 {
+.status-cards h3 {
   font-weight: normal;
 }
 
@@ -75,80 +75,80 @@ body {
   color: var(--text-main);
 }
 
-.battery_card {
+.card__battery {
   font-size: 1.875rem;
   padding-bottom: 0.625rem;
 }
 
-.battery_card--charged {
+.card__battery--charged {
   color: var(--color-full);
 }
 
-.battery_card--mid {
+.card__battery--mid {
   color: var(--color-mid);
 }
 
-.battery_card--low {
+.card__battery--low {
   color: var(--color-danger);
 }
 
-.progress_track {
+.bar {
   width: 100%;
   height: 0.25rem;
   background-color: #daddd8;
   border-radius: 0.125rem;
 }
 
-.progress_fill_battery {
+.bar__fill {
   height: 100%;
   border-radius: 0.125rem;
   width: 72%;
 }
 
-.progress_fill_battery--charged {
+.bar__fill--charged {
   background-color: var(--color-full);
 }
 
-.progress_fill_battery--mid {
+.bar__fill--mid {
   background-color: var(--color-mid);
 }
 
-.progress_fill_battery--low {
+.bar__fill--low {
   background-color: var(--color-danger);
 }
 
-.motors_speed_card--value,
-.temperature_card {
+.card__speed-value,
+.card__temperature {
   font-size: 1.875rem;
   font-weight: 500;
 }
 
-.temperature_card--mid {
+.card__temperature--mid {
   color: var(--color-mid);
 }
 
-.temperature_card--high {
+.card__temperature--high {
   color: var(--color-danger);
 }
 
-.motor_status_card {
+.card__status {
   font-weight: 500;
   font-size: 1.125rem;
 }
 
-.motor_status_card--running {
+.card__status--running {
   color: var(--color-full);
 }
 
-.motor_status_card--stopped {
+.card__status--stopped {
   color: var(--color-stopped);
 }
 
-.motor_status_card--charging {
+.card__status--charging {
   color: var(--color-charging);
 }
 
-.motor_status_card--warning {
+.card__status--warning {
   color: var(--color-danger);
 }
 
@@ -177,7 +177,7 @@ body {
   background-color: var(--color-danger);
 }
 
-.chart_layout {
+.chart-layout {
   margin-top: 1.5rem;
   display: flex;
   flex-direction: column;
@@ -185,15 +185,15 @@ body {
 }
 
 @media (min-width: 768px) {
-  .chart_layout {
+  .chart-layout {
     flex-direction: row;
   }
 }
-.chart_layout p {
+.chart-layout p {
   margin-top: 0.2rem;
 }
 
-.chart_card {
+.chart-card {
   padding: 3.125rem;
   width: 100%;
   border-radius: 0.75rem;
@@ -205,7 +205,7 @@ body {
   width: 50%;
 }
 
-.control_panel {
+.control-panel {
   margin-top: 1.5rem;
   background-color: #ffffff;
   border: 1px solid #e0e0e0;
@@ -213,20 +213,20 @@ body {
   padding: 1.25rem;
 }
 
-.control_panel h4 {
+.control-panel h4 {
   font-weight: normal;
   margin-left: 0.3rem;
   margin-top: 0.5rem;
   margin-bottom: 1rem;
 }
 
-.button_state_text {
+.btn-state-text {
   margin-left: 0.5rem;
   display: inline-block;
 }
 
 @media (max-width: 480px) {
-  .button_state_text {
+  .btn-state-text {
     display: block;
     margin-left: 0;
     margin-top: 1rem;
@@ -247,18 +247,18 @@ body {
   cursor: not-allowed;
 }
 
-.btn_control--stop {
+.btn--stop {
   background-color: var(--color-danger);
 }
 
-.btn_control--start {
+.btn--start {
   background-color: var(--color-full);
 }
 
-.btn_charge--ready {
+.btn--ready {
   background-color: var(--color-ready);
 }
 
-.btn_charge--charging {
+.btn--charging {
   background-color: var(--color-charging);
 }

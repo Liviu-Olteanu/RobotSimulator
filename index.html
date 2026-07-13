@@ -6,51 +6,50 @@
     <link rel="stylesheet" href="styles.css" />
     <script src="script.js"></script>
   </head>
-  <body class="dashboard_container">
+  <body class="dashboard-container">
     <header class="header">
-      <img src="RoboIcon.png" alt="dashboard-icon" class="header_icon" />
-      <h1 class="header_title">Robot Telemetry Dashboard</h1>
+      <img src="RoboIcon.png" alt="dashboard-icon" class="header__icon" />
+      <h1 class="header__title">Robot Telemetry Dashboard</h1>
     </header>
     <main>
-      <section class="status_cards">
+      <section class="status-cards">
         <div class="card">
           <h3>Battery</h3>
-          <p><span class="battery_card battery_card--charged">72%</span></p>
-          <div class="progress_track">
-            <div class="progress_fill_battery progress_fill_battery--charged"></div>
+          <p><span class="card__battery card__battery--charged">--%</span></p>
+          <div class="bar card__bar">
+            <div class="bar__fill bar__fill--charged"></div>
           </div>
         </div>
         <div class="card">
           <h3>Motor Speed</h3>
-          <p><span class="motors_speed_card--value">1,134</span>RPM</p>
+          <p><span class="card__speed-value">1,134</span>RPM</p>
         </div>
         <div class="card">
           <h3>Temperature</h3>
-          <p><span class="temperature_card">34</span>°C</p>
+          <p><span class="card__temperature">34</span>°C</p>
         </div>
         <div class="card">
           <h3>Motor Status</h3>
-          <div class="motor_status_card motor_status_card--running">
-            <span class="circle circle--running"></span>
-            <span class="motor_status_text">Running</span>
+          <div class="card__status card__status--running">
+            <p><span class="circle circle--running"></span>Running</p>
           </div>
         </div>
       </section>
-      <section class="chart_layout">
-        <div class="chart_card motor_speed_chart">
+      <section class="chart-layout">
+        <div class="chart-card chart-card--speed">
           <p>Motor speed over time</p>
           <img src="ChartPlaceholder.png" alt="motor-speed-chart" class="chart" />
         </div>
-        <div class="chart_card motor_speed_chart">
+        <div class="chart-card chart-card--temperature">
           <p>Temperature over time</p>
-          <img src="ChartPlaceholder.png" alt="motor-speed-chart" class="chart" />
+          <img src="ChartPlaceholder.png" alt="motor-temperature-chart" class="chart" />
         </div>
       </section>
-      <section class="control_panel">
+      <section class="control-panel">
         <h4>Control Panel</h4>
-        <button class="btn btn_control btn_control--stop">Stop motor</button>
-        <button class="btn btn_charge btn_charge--ready" disabled>Charge</button>
-        <span class="button_state_text">Motor is running. Stop motor before charging.</span>
+        <button class="btn btn--stop js-motor-btn">Stop motor</button>
+        <button class="btn btn--ready js-charge-btn" disabled>Charge</button>
+        <span class="control-panel__state-text">Motor is running. Stop motor before charging.</span>
       </section>
     </main>
   </body>
