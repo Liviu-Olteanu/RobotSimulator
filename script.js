@@ -69,6 +69,7 @@ function onLoad() {
       batteryLevelControl(-1, 10000);
       buttonStateText.textContent = MESSAGES.motorRunning;
       chargeButton.disabled = true;
+      updateMotorStatus();
     } else {
       controlButton.classList.add(CLASSES.motorStop);
     }
