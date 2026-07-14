@@ -123,6 +123,10 @@ body {
   font-weight: 500;
 }
 
+.card__speed-text {
+  display: none;
+}
+
 .card__temperature--mid {
   color: var(--color-mid);
 }
