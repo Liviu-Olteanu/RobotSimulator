@@ -39,8 +39,7 @@ function onLoad() {
   const motorTemperature = document.querySelector(".card__temperature");
 
   let temperatureValue = 20;
-  let temperatureClimbingInterval = null;
-  let temperatureFallingInterval = null;
+  let temperatureControlInterval = null;
   let motorSpeedValue = 1000;
   let motorSpeedControlInterval = null;
   let batteryCharge = 99;
@@ -50,62 +49,61 @@ function onLoad() {
   motorTemperature.textContent = `${temperatureValue}`;
   motorSpeed.textContent = `━`;
 
+  function randomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
   function motorTemperatureControl(motorOn) {
-    if (motorOn) {
-      clearInterval(temperatureFallingInterval);
-      temperatureClimbingInterval = setInterval(() => {
-        if (temperatureValue >= 80) {
-          temperatureValue = 80;
+    clearInterval(temperatureControlInterval);
+    const MIN_TEMP = 20;
+    const MAX_TEMP = 80;
+    if (!motorOn) {
+      temperatureControlInterval = setInterval(() => {
+        if (temperatureValue <= MIN_TEMP) {
+          temperatureValue = MIN_TEMP;
           motorTemperature.textContent = `${temperatureValue}`;
+          return;
         }
         motorTemperature.textContent = `${temperatureValue}`;
-        temperatureValue += Math.floor(Math.random() * 5) + 1;
-      }, 4500);
-    } else if (!motorOn) {
-      clearInterval(temperatureClimbingInterval);
-      temperatureFallingInterval = setInterval(() => {
-        temperatureValue -= Math.floor(Math.random() * 10) + 1;
-        if (temperatureValue <= 20) {
-          temperatureValue = 20;
-          motorTemperature.textContent = `${temperatureValue}`;
-          clearInterval(temperatureFallingInterval);
-        }
-        motorTemperature.textContent = `${temperatureValue}`;
+        temperatureValue -= randomInt(1, 10);
       }, 2500);
+    } else {
+      temperatureControlInterval = setInterval(() => {
+        if (temperatureValue >= MAX_TEMP) {
+          temperatureValue = MAX_TEMP;
+          motorTemperature.textContent = `${temperatureValue}`;
+          clearInterval(temperatureControlInterval);
+          toggleMotorButtonState();
+          return;
+        }
+        temperatureValue += randomInt(1, 5);
+        motorTemperature.textContent = `${temperatureValue}`;
+      }, 5000);
     }
   }
 
   function motorSpeedControl(motorOn) {
-    if (motorOn) {
-      motorSpeed.textContent = `${motorSpeedValue}`;
-      motorSpeedText.style.display = "inline";
-      motorSpeedControlInterval = setInterval(() => {
-        if (motorSpeedValue >= 1200) {
-          motorSpeedValue = 1200;
-          motorSpeed.textContent = `${motorSpeedValue}`;
-          motorSpeedText.style.display = "inline";
-          motorSpeedValue -= Math.floor(Math.random() * 50) + 1;
-        } else if (motorSpeedValue <= 1000) {
-          motorSpeedValue = 1000;
-          motorSpeed.textContent = `${motorSpeedValue}`;
-          motorSpeedText.style.display = "inline";
-          motorSpeedValue += Math.floor(Math.random() * 50) + 1;
-        }
-        motorSpeed.textContent = `${motorSpeedValue}`;
-        motorSpeedText.style.display = "inline";
-        let temp = Math.floor(Math.random() * 50) + 1;
-        if (temp <= 20) {
-          motorSpeedValue -= Math.floor(Math.random() * 80) + 1;
-        } else if (temp > 20) {
-          motorSpeedValue += Math.floor(Math.random() * 80) + 1;
-        }
-      }, 3000);
-    } else if (!motorOn) {
-      clearInterval(motorSpeedControlInterval);
+    clearInterval(motorSpeedControlInterval);
+    if (!motorOn) {
       motorSpeed.textContent = `━`;
       motorSpeedText.style.display = "none";
       motorSpeedValue = 1000;
+      return;
     }
+    const MIN_SPEED = 1000;
+    const MAX_SPEED = 1200;
+    motorSpeed.textContent = `${motorSpeedValue}`;
+    motorSpeedText.style.display = "inline";
+    motorSpeedControlInterval = setInterval(() => {
+      motorSpeed.textContent = `${motorSpeedValue}`;
+      motorSpeedText.style.display = "inline";
+      const step = randomInt(1, 80);
+      const goingDown = Math.random() < 0.4;
+      motorSpeedValue += goingDown ? -step : step;
+      if (motorSpeedValue > MAX_SPEED) motorSpeedValue = MAX_SPEED;
+      if (motorSpeedValue < MIN_SPEED) motorSpeedValue = MIN_SPEED;
+      motorSpeed.textContent = motorSpeedValue;
+    }, 3000);
   }
 
   function batteryLevelControl(level, time) {
