@@ -34,16 +34,81 @@ function onLoad() {
   const motorStatus = document.querySelector(".card__status");
   const motorStatusText = document.querySelector(".card__status-text");
   const motorStatusCircle = document.querySelector(".circle");
+  const motorSpeed = document.querySelector(".card__speed-value");
+  const motorSpeedText = document.querySelector(".card__speed-text");
+  const motorTemperature = document.querySelector(".card__temperature");
 
+  let temperatureValue = 20;
+  let temperatureControlInterval = null;
+  let motorSpeedValue = 1000;
+  let motorSpeedControlInterval = null;
   let batteryCharge = 99;
   let batteryControl = null;
 
   batteryChargePercentage.textContent = `${batteryCharge}%`;
+  motorTemperature.textContent = `${temperatureValue}`;
+  motorSpeed.textContent = `━`;
+
+  function randomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  function motorTemperatureControl(motorOn) {
+    clearInterval(temperatureControlInterval);
+    const MIN_TEMP = 20;
+    const MAX_TEMP = 80;
+    if (!motorOn) {
+      temperatureControlInterval = setInterval(() => {
+        if (temperatureValue <= MIN_TEMP) {
+          temperatureValue = MIN_TEMP;
+          motorTemperature.textContent = `${temperatureValue}`;
+          return;
+        }
+        motorTemperature.textContent = `${temperatureValue}`;
+        temperatureValue -= randomInt(1, 10);
+      }, 2500);
+    } else {
+      temperatureControlInterval = setInterval(() => {
+        if (temperatureValue >= MAX_TEMP) {
+          temperatureValue = MAX_TEMP;
+          motorTemperature.textContent = `${temperatureValue}`;
+          clearInterval(temperatureControlInterval);
+          toggleMotorButtonState();
+          return;
+        }
+        temperatureValue += randomInt(1, 5);
+        motorTemperature.textContent = `${temperatureValue}`;
+      }, 5000);
+    }
+  }
+
+  function motorSpeedControl(motorOn) {
+    clearInterval(motorSpeedControlInterval);
+    if (!motorOn) {
+      motorSpeed.textContent = `━`;
+      motorSpeedText.style.display = "none";
+      motorSpeedValue = 1000;
+      return;
+    }
+    const MIN_SPEED = 1000;
+    const MAX_SPEED = 1200;
+    motorSpeed.textContent = `${motorSpeedValue}`;
+    motorSpeedText.style.display = "inline";
+    motorSpeedControlInterval = setInterval(() => {
+      motorSpeed.textContent = `${motorSpeedValue}`;
+      motorSpeedText.style.display = "inline";
+      const step = randomInt(1, 80);
+      const goingDown = Math.random() < 0.4;
+      motorSpeedValue += goingDown ? -step : step;
+      if (motorSpeedValue > MAX_SPEED) motorSpeedValue = MAX_SPEED;
+      if (motorSpeedValue < MIN_SPEED) motorSpeedValue = MIN_SPEED;
+      motorSpeed.textContent = motorSpeedValue;
+    }, 3000);
+  }
 
   function batteryLevelControl(level, time) {
     batteryControl = setInterval(() => {
       batteryCharge += level;
-
       if (batteryCharge <= 0) {
         batteryCharge = 0;
         batteryChargePercentage.textContent = `${batteryCharge}%`;
@@ -119,6 +184,8 @@ function onLoad() {
     if (controlButton.classList.contains(CLASSES.motorStop)) {
       controlButton.classList.replace(CLASSES.motorStop, CLASSES.motorStart);
       updateMotorStatus();
+      motorSpeedControl(false);
+      motorTemperatureControl(false);
       controlButton.textContent = MESSAGES.btnStartMotor;
       clearInterval(batteryControl);
       buttonStateText.textContent = MESSAGES.motorStopped;
@@ -126,6 +193,8 @@ function onLoad() {
     } else if (controlButton.classList.contains(CLASSES.motorStart)) {
       controlButton.classList.replace(CLASSES.motorStart, CLASSES.motorStop);
       updateMotorStatus();
+      motorSpeedControl(true);
+      motorTemperatureControl(true);
       controlButton.textContent = MESSAGES.btnStopMotor;
       batteryLevelControl(-1, 10000);
       buttonStateText.textContent = MESSAGES.motorRunning;
@@ -140,7 +209,6 @@ function onLoad() {
       console.warn("The charge button has not been found.");
       return;
     }
-
     if (chargeButton.classList.contains(CLASSES.chargeReady)) {
       controlButton.disabled = true;
       buttonStateText.textContent = MESSAGES.chargingStatus(batteryCharge.toFixed(1));
