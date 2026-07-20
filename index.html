@@ -7,6 +7,9 @@
     <script src="script.js"></script>
   </head>
   <body class="dashboard-container">
+    <section class="banner">
+      <p class="banner__text">Low battery ━ <span class="banner__text--value">--</span>% remaining</p>
+    </section>
     <header class="header">
       <img src="RoboIcon.png" alt="dashboard-icon" class="header__icon" />
       <h1 class="header__title">Robot Telemetry Dashboard</h1>
@@ -15,9 +18,9 @@
       <section class="status-cards">
         <div class="card">
           <h3>Battery</h3>
-          <p><span class="card__battery card__battery--charged">--%</span></p>
+          <p><span class="card__battery">--%</span></p>
           <div class="bar card__bar">
-            <div class="bar__fill bar__fill--charged"></div>
+            <div class="bar__fill"></div>
           </div>
         </div>
         <div class="card">
