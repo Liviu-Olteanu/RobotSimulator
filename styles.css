@@ -6,15 +6,46 @@
   --color-stopped: #7c7c7c;
   --color-ready: #f5f5f5;
   --btn-border-color: #ebc9c9;
+  --banner-text-danger: #ab3f3f;
+  --banner-text-warning: #926123;
 
   --bg-main: #faf9f5;
   --bg-card: #f5f4ed;
+  --bg-banner-warning: #faeeda;
+  --bg-banner-danger: #fcebeb;
   --text-main: #000000;
 }
 
 * {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   box-sizing: border-box;
+}
+
+.banner {
+  display: none;
+  border-radius: 0.625rem;
+  border: 1px solid #e0e0e0;
+}
+
+.banner--warning {
+  background-color: var(--bg-banner-warning);
+}
+
+.banner--danger {
+  background-color: var(--bg-banner-danger);
+}
+
+.banner__text {
+  font-weight: 600;
+  margin: 0.5rem auto 0.5rem 0.75rem;
+}
+
+.banner__text--warning {
+  color: var(--banner-text-warning);
+}
+
+.banner__text--danger {
+  color: var(--banner-text-danger);
 }
 
 .dashboard-container {
@@ -102,7 +133,7 @@ body {
 .bar__fill {
   height: 100%;
   border-radius: 0.125rem;
-  width: 72%;
+  width: 0%;
 }
 
 .bar__fill--charged {

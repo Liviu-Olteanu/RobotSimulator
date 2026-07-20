@@ -7,14 +7,26 @@ function onLoad() {
     motorStatusRunning: "card__status--running",
     motorStatusStopped: "card__status--stopped",
     motorStatusCharging: "card__status--charging",
+    motorStatusDanger: "card__status--warning",
     circleRunning: "circle--running",
     circleStopped: "circle--stopped",
     circleCharging: "circle--charging",
+    circleDanger: "circle--warning",
+    bannerStatusWarning: "banner--warning",
+    bannerStatusDanger: "banner--danger",
+    bannerTextWarning: "banner__text--warning",
+    bannerTextDanger: "banner__text--danger",
+    cardBatteryFull: "card__battery--charged",
+    cardBatteryMid: "card__battery--mid",
+    cardBatteryLow: "card__battery--low",
+    progressBarFull: "bar__fill--charged",
+    progressBarMid: "bar__fill--mid",
+    progressBarLow: "bar__fill--low",
   };
 
   const MESSAGES = {
-    batteryDepleted: "The battery is fully depleted.",
-    batteryFull: "The battery is fully charged.",
+    batteryDepleted: "Battery depleted! Charge to continue.",
+    batteryFull: "The battery is fully charged. You can start motor at any time.",
     motorStopped: "Motor is stopped. You can start motor or charge.",
     motorRunning: "Motor is running. Stop motor before charging.",
     btnStartMotor: "Start motor",
@@ -25,6 +37,9 @@ function onLoad() {
     motorStatusRunning: "Running",
     motorStatusStopped: "Stopped",
     motorStatusCharging: "Charging",
+    motorStatusDepleted: "Depleted",
+    bannerTextWarning: (charge) => `Low battery ━ ${charge}% remaining`,
+    bannerTextDanger: "Battery depleted ━ motor shut down automatically",
   };
 
   const controlButton = document.querySelector(".js-motor-btn");
@@ -37,18 +52,86 @@ function onLoad() {
   const motorSpeed = document.querySelector(".card__speed-value");
   const motorSpeedText = document.querySelector(".card__speed-text");
   const motorTemperature = document.querySelector(".card__temperature");
+  const batteryChargeBanner = document.querySelector(".banner");
+  const batteryBannerText = document.querySelector(".banner__text");
+  const bannerTextValue = document.querySelector(".banner__text--value");
+  const progressBarFill = document.querySelector(".bar__fill");
 
   let temperatureValue = 20;
   let temperatureControlInterval = null;
   let motorSpeedValue = 1000;
   let motorSpeedControlInterval = null;
-  let batteryCharge = 99;
+  let batteryCharge = 55.0;
   let batteryControl = null;
 
-  batteryChargePercentage.textContent = `${batteryCharge}%`;
+  batteryChargePercentage.textContent = `${batteryCharge.toFixed(1)}%`;
   motorTemperature.textContent = `${temperatureValue}`;
   motorSpeed.textContent = `━`;
 
+  function batteryCardColorControl() {
+    if (!batteryChargePercentage) {
+      console.warn("The battery card has not been found.");
+      return;
+    }
+    if (batteryCharge > 50) {
+      if (batteryChargePercentage.classList.contains(CLASSES.cardBatteryMid)) {
+        batteryChargePercentage.classList.replace(CLASSES.cardBatteryMid, CLASSES.cardBatteryFull);
+        progressBarFill.classList.replace(CLASSES.progressBarMid, CLASSES.progressBarFull);
+      } else {
+        batteryChargePercentage.classList.add(CLASSES.cardBatteryFull);
+        progressBarFill.classList.add(CLASSES.progressBarFull);
+      }
+    } else if (batteryCharge > 20 && batteryCharge <= 50) {
+      if (batteryChargePercentage.classList.contains(CLASSES.cardBatteryLow)) {
+        batteryChargePercentage.classList.replace(CLASSES.cardBatteryLow, CLASSES.cardBatteryMid);
+        progressBarFill.classList.replace(CLASSES.progressBarLow, CLASSES.progressBarMid);
+      } else if (batteryChargePercentage.classList.contains(CLASSES.cardBatteryFull)) {
+        batteryChargePercentage.classList.replace(CLASSES.cardBatteryFull, CLASSES.cardBatteryMid);
+        progressBarFill.classList.replace(CLASSES.progressBarFull, CLASSES.progressBarMid);
+      } else {
+        batteryChargePercentage.classList.add(CLASSES.cardBatteryMid);
+        progressBarFill.classList.add(CLASSES.progressBarMid);
+      }
+    } else {
+      if (batteryChargePercentage.classList.contains(CLASSES.cardBatteryMid)) {
+        batteryChargePercentage.classList.replace(CLASSES.cardBatteryMid, CLASSES.cardBatteryLow);
+        progressBarFill.classList.replace(CLASSES.progressBarMid, CLASSES.progressBarLow);
+      } else {
+        batteryChargePercentage.classList.add(CLASSES.cardBatteryLow);
+        progressBarFill.classList.add(CLASSES.progressBarLow);
+      }
+    }
+  }
+
+  function bannerControl() {
+    if (!batteryChargeBanner) {
+      console.warn("The battery banner has not been found.");
+      return;
+    }
+    if (batteryCharge > 15) {
+      batteryChargeBanner.style.display = "none";
+    } else if (batteryCharge <= 15 && batteryCharge != 0) {
+      batteryChargeBanner.style.display = "block";
+      batteryBannerText.textContent = MESSAGES.bannerTextWarning(batteryCharge.toFixed(1));
+      if (batteryChargeBanner.classList.contains(CLASSES.bannerStatusDanger)) {
+        batteryChargeBanner.classList.replace(CLASSES.bannerStatusDanger, CLASSES.bannerStatusWarning);
+        batteryBannerText.classList.replace(CLASSES.bannerTextDanger, CLASSES.bannerTextWarning);
+      } else {
+        batteryChargeBanner.classList.add(CLASSES.bannerStatusWarning);
+        batteryBannerText.classList.add(CLASSES.bannerTextWarning);
+      }
+    } else if (batteryCharge === 0) {
+      batteryChargeBanner.style.display = "block";
+      batteryBannerText.textContent = MESSAGES.bannerTextDanger;
+      if (batteryChargeBanner.classList.contains(CLASSES.bannerStatusWarning)) {
+        batteryChargeBanner.classList.replace(CLASSES.bannerStatusWarning, CLASSES.bannerStatusDanger);
+        batteryBannerText.classList.replace(CLASSES.bannerTextWarning, CLASSES.bannerTextDanger);
+      } else {
+        batteryChargeBanner.classList.add(CLASSES.bannerStatusDanger);
+        batteryBannerText.classList.add(CLASSES.bannerTextDanger);
+      }
+    }
+  }
   function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
@@ -107,20 +190,30 @@ function onLoad() {
   }
 
   function batteryLevelControl(level, time) {
+    bannerControl();
     batteryControl = setInterval(() => {
       batteryCharge += level;
+      batteryCardColorControl();
       if (batteryCharge <= 0) {
         batteryCharge = 0;
         batteryChargePercentage.textContent = `${batteryCharge}%`;
-        buttonStateText.textContent = MESSAGES.batteryDepleted;
+        progressBarFill.style.width = `${batteryCharge}%`;
+        toggleMotorButtonState();
+        controlButton.disabled = true;
+        bannerControl();
         clearInterval(batteryControl);
       } else if (batteryCharge >= 100) {
         batteryCharge = 100;
         batteryChargePercentage.textContent = `${batteryCharge.toFixed(0)}%`;
+        progressBarFill.style.width = `${batteryCharge}%`;
+        toggleChargeButtonState();
+        chargeButton.disabled = true;
         buttonStateText.textContent = MESSAGES.batteryFull;
         clearInterval(batteryControl);
       } else {
         batteryChargePercentage.textContent = `${batteryCharge.toFixed(1)}%`;
+        progressBarFill.style.width = `${batteryCharge}%`;
+        bannerControl();
         if (level > 0) {
           buttonStateText.textContent = MESSAGES.chargingStatus(batteryCharge.toFixed(1));
         }
@@ -140,10 +233,20 @@ function onLoad() {
       motorStatusCircle.classList.replace(CLASSES.circleStopped, CLASSES.circleRunning);
       motorStatus.classList.replace(CLASSES.motorStatusStopped, CLASSES.motorStatusRunning);
       motorStatusText.textContent = MESSAGES.motorStatusRunning;
+    } else if (motorStatus.classList.contains(CLASSES.motorStatusDanger) && motorStatusCircle.classList.contains(CLASSES.circleDanger)) {
+      motorStatusCircle.classList.replace(CLASSES.circleDanger, CLASSES.circleRunning);
+      motorStatus.classList.replace(CLASSES.motorStatusDanger, CLASSES.motorStatusRunning);
+      motorStatusText.textContent = MESSAGES.motorStatusDepleted;
     } else if (motorStatus.classList.contains(CLASSES.motorStatusRunning) && motorStatusCircle.classList.contains(CLASSES.circleRunning)) {
-      motorStatusCircle.classList.replace(CLASSES.circleRunning, CLASSES.circleStopped);
-      motorStatus.classList.replace(CLASSES.motorStatusRunning, CLASSES.motorStatusStopped);
-      motorStatusText.textContent = MESSAGES.motorStatusStopped;
+      if (batteryCharge === 0) {
+        motorStatusCircle.classList.replace(CLASSES.circleRunning, CLASSES.circleDanger);
+        motorStatus.classList.replace(CLASSES.motorStatusRunning, CLASSES.motorStatusDanger);
+        motorStatusText.textContent = MESSAGES.motorStatusDepleted;
+      } else {
+        motorStatusCircle.classList.replace(CLASSES.circleRunning, CLASSES.circleStopped);
+        motorStatus.classList.replace(CLASSES.motorStatusRunning, CLASSES.motorStatusStopped);
+        motorStatusText.textContent = MESSAGES.motorStatusStopped;
+      }
     } else {
       motorStatus.classList.add(CLASSES.motorStatusStopped);
       motorStatusCircle.classList.add(CLASSES.circleStopped);
@@ -162,13 +265,23 @@ function onLoad() {
       motorStatusCircle.classList.replace(CLASSES.circleStopped, CLASSES.circleCharging);
       motorStatus.classList.replace(CLASSES.motorStatusStopped, CLASSES.motorStatusCharging);
       motorStatusText.textContent = MESSAGES.motorStatusCharging;
+    } else if (motorStatus.classList.contains(CLASSES.motorStatusDanger) && motorStatusCircle.classList.contains(CLASSES.circleDanger)) {
+      motorStatusCircle.classList.replace(CLASSES.circleDanger, CLASSES.circleCharging);
+      motorStatus.classList.replace(CLASSES.motorStatusDanger, CLASSES.motorStatusCharging);
+      motorStatusText.textContent = MESSAGES.motorStatusCharging;
     } else if (
       motorStatus.classList.contains(CLASSES.motorStatusCharging) &&
       motorStatusCircle.classList.contains(CLASSES.circleCharging)
     ) {
-      motorStatusCircle.classList.replace(CLASSES.circleCharging, CLASSES.circleStopped);
-      motorStatus.classList.replace(CLASSES.motorStatusCharging, CLASSES.motorStatusStopped);
-      motorStatusText.textContent = MESSAGES.motorStatusStopped;
+      if (batteryCharge === 0) {
+        motorStatusCircle.classList.replace(CLASSES.circleCharging, CLASSES.circleDanger);
+        motorStatus.classList.replace(CLASSES.motorStatusCharging, CLASSES.motorStatusDanger);
+        motorStatusText.textContent = MESSAGES.motorStatusDepleted;
+      } else {
+        motorStatusCircle.classList.replace(CLASSES.circleCharging, CLASSES.circleStopped);
+        motorStatus.classList.replace(CLASSES.motorStatusCharging, CLASSES.motorStatusStopped);
+        motorStatusText.textContent = MESSAGES.motorStatusStopped;
+      }
     } else {
       motorStatus.classList.add(CLASSES.motorStatusStopped);
       motorStatusCircle.classList.add(CLASSES.circleStopped);
@@ -180,23 +293,32 @@ function onLoad() {
       console.warn("The control button has not been found.");
       return;
     }
-
     if (controlButton.classList.contains(CLASSES.motorStop)) {
       controlButton.classList.replace(CLASSES.motorStop, CLASSES.motorStart);
-      updateMotorStatus();
       motorSpeedControl(false);
       motorTemperatureControl(false);
       controlButton.textContent = MESSAGES.btnStartMotor;
       clearInterval(batteryControl);
-      buttonStateText.textContent = MESSAGES.motorStopped;
-      chargeButton.disabled = false;
+      if (batteryCharge === 100) {
+        buttonStateText.textContent = MESSAGES.batteryFull;
+        chargeButton.disabled = true;
+      } else if (batteryCharge === 0) {
+        buttonStateText.textContent = MESSAGES.batteryDepleted;
+        controlButton.disabled = true;
+        chargeButton.disabled = false;
+      } else {
+        buttonStateText.textContent = MESSAGES.motorStopped;
+        chargeButton.disabled = false;
+      }
+      updateMotorStatus();
     } else if (controlButton.classList.contains(CLASSES.motorStart)) {
       controlButton.classList.replace(CLASSES.motorStart, CLASSES.motorStop);
       updateMotorStatus();
       motorSpeedControl(true);
       motorTemperatureControl(true);
       controlButton.textContent = MESSAGES.btnStopMotor;
-      batteryLevelControl(-1, 10000);
+      batteryLevelControl(-1, 1000);
+
       buttonStateText.textContent = MESSAGES.motorRunning;
       chargeButton.disabled = true;
     } else {
@@ -215,14 +337,19 @@ function onLoad() {
       updateChargeStatus();
       chargeButton.textContent = MESSAGES.btnStopCharging;
       chargeButton.classList.replace(CLASSES.chargeReady, CLASSES.chargeCharging);
-      batteryLevelControl(+0.1, 1000);
+      batteryLevelControl(+0.1, 100);
     } else if (chargeButton.classList.contains(CLASSES.chargeCharging)) {
-      controlButton.disabled = false;
       chargeButton.textContent = MESSAGES.btnCharge;
-      updateChargeStatus();
       chargeButton.classList.replace(CLASSES.chargeCharging, CLASSES.chargeReady);
       clearInterval(batteryControl);
-      buttonStateText.textContent = MESSAGES.motorStopped;
+      if (batteryCharge === 0) {
+        buttonStateText.textContent = MESSAGES.batteryDepleted;
+        controlButton.disabled = true;
+      } else {
+        controlButton.disabled = false;
+        buttonStateText.textContent = MESSAGES.motorStopped;
+      }
+      updateChargeStatus();
     } else {
       chargeButton.classList.add(CLASSES.chargeReady);
     }
@@ -232,6 +359,9 @@ function onLoad() {
   chargeButton.addEventListener("click", toggleChargeButtonState);
 
   toggleMotorButtonState();
+  bannerControl();
+  progressBarFill.style.width = `${batteryCharge}%`;
+  batteryCardColorControl();
 }
 
 window.addEventListener("load", onLoad);
