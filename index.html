@@ -7,8 +7,11 @@
     <script src="script.js"></script>
   </head>
   <body class="dashboard-container">
-    <section class="banner">
-      <p class="banner__text">Low battery ━ <span class="banner__text--value">--</span>% remaining</p>
+    <section class="banner banner__temperature banner--danger">
+      <p class="banner__temperature-text banner__temperature-text--danger">Overheated at 80°C ━ cooling down, motor locked</p>
+    </section>
+    <section class="banner banner__battery">
+      <p class="banner__battery-text">Low battery ━ --% remaining</p>
     </section>
     <header class="header">
       <img src="RoboIcon.png" alt="dashboard-icon" class="header__icon" />
