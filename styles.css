@@ -26,6 +26,11 @@
   border-radius: 0.625rem;
   border: 1px solid #e0e0e0;
 }
+.banner__temperature,
+.banner__battery {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
 
 .banner--warning {
   background-color: var(--bg-banner-warning);
@@ -35,16 +40,18 @@
   background-color: var(--bg-banner-danger);
 }
 
-.banner__text {
+.banner__battery-text,
+.banner__temperature-text {
   font-weight: 600;
   margin: 0.5rem auto 0.5rem 0.75rem;
 }
 
-.banner__text--warning {
+.banner__battery-text--warning {
   color: var(--banner-text-warning);
 }
 
-.banner__text--danger {
+.banner__battery-text--danger,
+.banner__temperature-text--danger {
   color: var(--banner-text-danger);
 }
 

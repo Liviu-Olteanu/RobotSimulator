@@ -14,14 +14,16 @@ function onLoad() {
     circleDanger: "circle--warning",
     bannerStatusWarning: "banner--warning",
     bannerStatusDanger: "banner--danger",
-    bannerTextWarning: "banner__text--warning",
-    bannerTextDanger: "banner__text--danger",
+    bannerTextWarning: "banner__battery-text--warning",
+    bannerTextDanger: "banner__battery-text--danger",
     cardBatteryFull: "card__battery--charged",
     cardBatteryMid: "card__battery--mid",
     cardBatteryLow: "card__battery--low",
     progressBarFull: "bar__fill--charged",
     progressBarMid: "bar__fill--mid",
     progressBarLow: "bar__fill--low",
+    cardTemperatureMid: "card__temperature--mid",
+    cardTemperatureHigh: "card__temperature--high",
   };
 
   const MESSAGES = {
@@ -38,8 +40,10 @@ function onLoad() {
     motorStatusStopped: "Stopped",
     motorStatusCharging: "Charging",
     motorStatusDepleted: "Depleted",
+    motorStatusOverheated: "Overheated",
     bannerTextWarning: (charge) => `Low battery ━ ${charge}% remaining`,
     bannerTextDanger: "Battery depleted ━ motor shut down automatically",
+    motorOverheated: "Overheated! Motor locked until temp drops below 40°C. You can charge while waiting.",
   };
 
   const controlButton = document.querySelector(".js-motor-btn");
@@ -52,16 +56,18 @@ function onLoad() {
   const motorSpeed = document.querySelector(".card__speed-value");
   const motorSpeedText = document.querySelector(".card__speed-text");
   const motorTemperature = document.querySelector(".card__temperature");
-  const batteryChargeBanner = document.querySelector(".banner");
-  const batteryBannerText = document.querySelector(".banner__text");
-  const bannerTextValue = document.querySelector(".banner__text--value");
+  const batteryChargeBanner = document.querySelector(".banner__battery");
+  const batteryBannerText = document.querySelector(".banner__battery-text");
   const progressBarFill = document.querySelector(".bar__fill");
+  const temperatureStateBanner = document.querySelector(".banner__temperature");
 
+  let overheated = false;
+  let charging = false;
   let temperatureValue = 20;
   let temperatureControlInterval = null;
   let motorSpeedValue = 1000;
   let motorSpeedControlInterval = null;
-  let batteryCharge = 55.0;
+  let batteryCharge = 16.0;
   let batteryControl = null;
 
   batteryChargePercentage.textContent = `${batteryCharge.toFixed(1)}%`;
@@ -132,6 +138,63 @@ function onLoad() {
       }
     }
   }
+
+  function temperatureColorControl() {
+    if (temperatureValue <= 45) {
+      if (motorTemperature.classList.contains(CLASSES.cardTemperatureMid)) {
+        motorTemperature.classList.remove(CLASSES.cardTemperatureMid);
+      }
+      return;
+    } else if (temperatureValue > 45 && temperatureValue <= 60) {
+      if (motorTemperature.classList.contains(CLASSES.cardTemperatureHigh)) {
+        motorTemperature.classList.replace(CLASSES.cardTemperatureHigh, CLASSES.cardTemperatureMid);
+      } else {
+        motorTemperature.classList.add(CLASSES.cardTemperatureMid);
+      }
+    } else {
+      if (motorTemperature.classList.contains(CLASSES.cardTemperatureMid)) {
+        motorTemperature.classList.replace(CLASSES.cardTemperatureMid, CLASSES.cardTemperatureHigh);
+      } else {
+        motorTemperature.classList.add(CLASSES.cardTemperatureHigh);
+      }
+    }
+  }
+
+  function temperatureStatusOverheated() {
+    if (overheated) {
+      if (motorStatus.classList.contains(CLASSES.motorStatusStopped)) {
+        motorStatusCircle.classList.replace(CLASSES.circleStopped, CLASSES.circleDanger);
+        motorStatus.classList.replace(CLASSES.motorStatusStopped, CLASSES.motorStatusDanger);
+        motorStatusText.textContent = MESSAGES.motorStatusOverheated;
+      } else if (motorStatus.classList.contains(CLASSES.motorStatusRunning)) {
+        motorStatusCircle.classList.replace(CLASSES.circleRunning, CLASSES.circleDanger);
+        motorStatus.classList.replace(CLASSES.motorStatusRunning, CLASSES.motorStatusDanger);
+        motorStatusText.textContent = MESSAGES.motorStatusOverheated;
+      }
+    } else if (!charging) {
+      motorStatusCircle.classList.replace(CLASSES.circleDanger, CLASSES.circleStopped);
+      motorStatus.classList.replace(CLASSES.motorStatusDanger, CLASSES.motorStatusStopped);
+      motorStatusText.textContent = MESSAGES.motorStatusStopped;
+    }
+  }
+
+  function overheatingLogic() {
+    if (overheated && temperatureValue > 40) {
+      controlButton.disabled = true;
+      temperatureStatusOverheated();
+    } else if (temperatureValue <= 40 && overheated && !charging) {
+      controlButton.disabled = false;
+      overheated = false;
+      temperatureStatusOverheated();
+      buttonStateText.textContent = MESSAGES.motorStopped;
+      temperatureStateBanner.style.display = "none";
+    } else {
+      overheated = false;
+      temperatureStatusOverheated();
+      temperatureStateBanner.style.display = "none";
+    }
+  }
+
   function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
@@ -147,6 +210,8 @@ function onLoad() {
           motorTemperature.textContent = `${temperatureValue}`;
           return;
         }
+        temperatureColorControl();
+        overheatingLogic();
         motorTemperature.textContent = `${temperatureValue}`;
         temperatureValue -= randomInt(1, 10);
       }, 2500);
@@ -155,13 +220,17 @@ function onLoad() {
         if (temperatureValue >= MAX_TEMP) {
           temperatureValue = MAX_TEMP;
           motorTemperature.textContent = `${temperatureValue}`;
+          overheated = true;
+          temperatureStateBanner.style.display = "block";
           clearInterval(temperatureControlInterval);
           toggleMotorButtonState();
+          temperatureStatusOverheated();
           return;
         }
-        temperatureValue += randomInt(1, 5);
+        temperatureColorControl();
         motorTemperature.textContent = `${temperatureValue}`;
-      }, 5000);
+        temperatureValue += randomInt(1, 5);
+      }, 500);
     }
   }
 
@@ -261,7 +330,18 @@ function onLoad() {
       console.warn("The status circle has not been found.");
       return;
     }
-    if (motorStatus.classList.contains(CLASSES.motorStatusStopped) && motorStatusCircle.classList.contains(CLASSES.circleStopped)) {
+    if (overheated) {
+      if (motorStatus.classList.contains(CLASSES.motorStatusCharging)) {
+        motorStatusCircle.classList.replace(CLASSES.circleCharging, CLASSES.circleDanger);
+        motorStatus.classList.replace(CLASSES.motorStatusCharging, CLASSES.motorStatusDanger);
+        motorStatusText.textContent = MESSAGES.motorStatusOverheated;
+        buttonStateText.textContent = MESSAGES.motorOverheated;
+      } else {
+        motorStatusCircle.classList.replace(CLASSES.circleDanger, CLASSES.circleCharging);
+        motorStatus.classList.replace(CLASSES.motorStatusDanger, CLASSES.motorStatusCharging);
+        motorStatusText.textContent = MESSAGES.motorStatusCharging;
+      }
+    } else if (motorStatus.classList.contains(CLASSES.motorStatusStopped) && motorStatusCircle.classList.contains(CLASSES.circleStopped)) {
       motorStatusCircle.classList.replace(CLASSES.circleStopped, CLASSES.circleCharging);
       motorStatus.classList.replace(CLASSES.motorStatusStopped, CLASSES.motorStatusCharging);
       motorStatusText.textContent = MESSAGES.motorStatusCharging;
@@ -299,17 +379,18 @@ function onLoad() {
       motorTemperatureControl(false);
       controlButton.textContent = MESSAGES.btnStartMotor;
       clearInterval(batteryControl);
-      if (batteryCharge === 100) {
+      controlButton.disabled = overheated || batteryCharge === 0;
+      chargeButton.disabled = batteryCharge === 100 || batteryCharge === 0;
+      if (overheated) {
+        buttonStateText.textContent = MESSAGES.motorOverheated;
+      } else if (batteryCharge === 100) {
         buttonStateText.textContent = MESSAGES.batteryFull;
-        chargeButton.disabled = true;
       } else if (batteryCharge === 0) {
         buttonStateText.textContent = MESSAGES.batteryDepleted;
-        controlButton.disabled = true;
-        chargeButton.disabled = false;
       } else {
         buttonStateText.textContent = MESSAGES.motorStopped;
-        chargeButton.disabled = false;
       }
+
       updateMotorStatus();
     } else if (controlButton.classList.contains(CLASSES.motorStart)) {
       controlButton.classList.replace(CLASSES.motorStart, CLASSES.motorStop);
@@ -317,7 +398,7 @@ function onLoad() {
       motorSpeedControl(true);
       motorTemperatureControl(true);
       controlButton.textContent = MESSAGES.btnStopMotor;
-      batteryLevelControl(-1, 1000);
+      batteryLevelControl(-1, 10000);
 
       buttonStateText.textContent = MESSAGES.motorRunning;
       chargeButton.disabled = true;
@@ -332,20 +413,22 @@ function onLoad() {
       return;
     }
     if (chargeButton.classList.contains(CLASSES.chargeReady)) {
+      charging = true;
       controlButton.disabled = true;
       buttonStateText.textContent = MESSAGES.chargingStatus(batteryCharge.toFixed(1));
       updateChargeStatus();
       chargeButton.textContent = MESSAGES.btnStopCharging;
       chargeButton.classList.replace(CLASSES.chargeReady, CLASSES.chargeCharging);
-      batteryLevelControl(+0.1, 100);
+      batteryLevelControl(+0.1, 1000);
     } else if (chargeButton.classList.contains(CLASSES.chargeCharging)) {
+      charging = false;
       chargeButton.textContent = MESSAGES.btnCharge;
       chargeButton.classList.replace(CLASSES.chargeCharging, CLASSES.chargeReady);
       clearInterval(batteryControl);
       if (batteryCharge === 0) {
         buttonStateText.textContent = MESSAGES.batteryDepleted;
         controlButton.disabled = true;
-      } else {
+      } else if (!overheated) {
         controlButton.disabled = false;
         buttonStateText.textContent = MESSAGES.motorStopped;
       }
