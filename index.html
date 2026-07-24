@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="styles.css" />
     <script src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
   <body class="dashboard-container">
     <section class="banner banner__temperature banner--danger">
@@ -46,7 +47,7 @@
       <section class="chart-layout">
         <div class="chart-card chart-card--speed">
           <p>Motor speed over time</p>
-          <img src="ChartPlaceholder.png" alt="motor-speed-chart" class="chart" />
+          <canvas class="chart__speed"></canvas>
         </div>
         <div class="chart-card chart-card--temperature">
           <p>Temperature over time</p>
