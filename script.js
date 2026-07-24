@@ -60,15 +60,111 @@ function onLoad() {
   const batteryBannerText = document.querySelector(".banner__battery-text");
   const progressBarFill = document.querySelector(".bar__fill");
   const temperatureStateBanner = document.querySelector(".banner__temperature");
+  const speedChart = document.querySelector(".chart__speed");
 
+  const CHART_LINE_COLOR = "#378add";
+  const CHART_COLOR_OPACITY = "15";
+  const CHART_BG_COLOR = CHART_LINE_COLOR + CHART_COLOR_OPACITY;
   let overheated = false;
   let charging = false;
   let temperatureValue = 20;
   let temperatureControlInterval = null;
-  let motorSpeedValue = 1000;
+  let motorSpeedValue = 0;
+  let motorSpeedArray = new Array(30).fill(0);
   let motorSpeedControlInterval = null;
-  let batteryCharge = 16.0;
+  let batteryCharge = 70.0;
   let batteryControl = null;
+  let timeArray = [];
+
+  function timeDataLoop() {
+    setInterval(() => {
+      timeArray.shift();
+      let now = new Date();
+      let m = now.getMinutes();
+      let s = now.getSeconds();
+      if (m <= 0 && s <= 0) {
+        m = 59;
+        s = 59;
+      } else if (s <= 0) {
+        s = 59;
+        m -= 1;
+      } else {
+        s -= 1;
+      }
+      timeArray.push(String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0"));
+    }, 1000);
+  }
+
+  function speedChartLoop(chart) {
+    setInterval(() => {
+      motorSpeedArray.shift();
+      motorSpeedArray.push(motorSpeedValue);
+    }, 1000);
+    setInterval(() => {
+      chart.update("none");
+    }, 2000);
+  }
+
+  function fillDateArray() {
+    let now = new Date();
+    let minutes = now.getMinutes();
+    let seconds = now.getSeconds();
+
+    for (let i = 0; i < 30; i++) {
+      timeArray[29 - i] = String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
+      if (minutes <= 0 && seconds <= 0) {
+        minutes = 59;
+        seconds = 59;
+      } else if (seconds <= 0) {
+        seconds = 59;
+        minutes -= 1;
+      } else {
+        seconds -= 1;
+      }
+    }
+  }
+
+  fillDateArray();
+
+  let speedChartAppearance = new Chart(speedChart, {
+    type: "line",
+    data: {
+      labels: timeArray,
+      datasets: [
+        {
+          data: motorSpeedArray,
+          fill: "origin",
+          backgroundColor: CHART_BG_COLOR,
+          borderColor: CHART_LINE_COLOR,
+          tension: 0.4,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      elements: {
+        point: {
+          pointStyle: false,
+        },
+      },
+      plugins: {
+        legend: {
+          display: false,
+        },
+      },
+      scales: {
+        x: {
+          ticks: {
+            maxTicksLimit: 5,
+          },
+        },
+        y: {
+          suggestedMin: 0,
+          suggestedMax: 1200,
+        },
+      },
+    },
+  });
 
   batteryChargePercentage.textContent = `${batteryCharge.toFixed(1)}%`;
   motorTemperature.textContent = `${temperatureValue}`;
@@ -230,7 +326,7 @@ function onLoad() {
         temperatureColorControl();
         motorTemperature.textContent = `${temperatureValue}`;
         temperatureValue += randomInt(1, 5);
-      }, 500);
+      }, 5000);
     }
   }
 
@@ -239,9 +335,10 @@ function onLoad() {
     if (!motorOn) {
       motorSpeed.textContent = `━`;
       motorSpeedText.style.display = "none";
-      motorSpeedValue = 1000;
+      motorSpeedValue = 0;
       return;
     }
+    motorSpeedValue = 1000;
     const MIN_SPEED = 1000;
     const MAX_SPEED = 1200;
     motorSpeed.textContent = `${motorSpeedValue}`;
@@ -445,6 +542,8 @@ function onLoad() {
   bannerControl();
   progressBarFill.style.width = `${batteryCharge}%`;
   batteryCardColorControl();
+  timeDataLoop();
+  speedChartLoop(speedChartAppearance);
 }
 
 window.addEventListener("load", onLoad);
