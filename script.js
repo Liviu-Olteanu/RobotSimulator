@@ -61,13 +61,18 @@ function onLoad() {
   const progressBarFill = document.querySelector(".bar__fill");
   const temperatureStateBanner = document.querySelector(".banner__temperature");
   const speedChart = document.querySelector(".chart__speed");
+  const temperatureChart = document.querySelector(".chart__temperature");
 
-  const CHART_LINE_COLOR = "#378add";
-  const CHART_COLOR_OPACITY = "15";
-  const CHART_BG_COLOR = CHART_LINE_COLOR + CHART_COLOR_OPACITY;
+  const SPEED_CHART_LINE_COLOR = "#378add";
+  const SPEED_CHART_COLOR_OPACITY = "15";
+  const SPEED_CHART_BG_COLOR = SPEED_CHART_LINE_COLOR + SPEED_CHART_COLOR_OPACITY;
+  const TEMP_CHART_LINE_COLOR = "#d85a30";
+  const TEMP_CHART_COLOR_OPACITY = "15";
+  const TEMP_CHART_BG_COLOR = TEMP_CHART_LINE_COLOR + TEMP_CHART_COLOR_OPACITY;
   let overheated = false;
   let charging = false;
   let temperatureValue = 20;
+  let temperatureArray = new Array(30).fill(20);
   let temperatureControlInterval = null;
   let motorSpeedValue = 0;
   let motorSpeedArray = new Array(30).fill(0);
@@ -99,10 +104,16 @@ function onLoad() {
     setInterval(() => {
       motorSpeedArray.shift();
       motorSpeedArray.push(motorSpeedValue);
-    }, 1000);
-    setInterval(() => {
       chart.update("none");
-    }, 2000);
+    }, 1000);
+  }
+
+  function temperatureChartLoop(chart) {
+    setInterval(() => {
+      temperatureArray.shift();
+      temperatureArray.push(temperatureValue);
+      chart.update("none");
+    }, 1000);
   }
 
   function fillDateArray() {
@@ -134,8 +145,8 @@ function onLoad() {
         {
           data: motorSpeedArray,
           fill: "origin",
-          backgroundColor: CHART_BG_COLOR,
-          borderColor: CHART_LINE_COLOR,
+          backgroundColor: SPEED_CHART_BG_COLOR,
+          borderColor: SPEED_CHART_LINE_COLOR,
           tension: 0.4,
         },
       ],
@@ -161,6 +172,46 @@ function onLoad() {
         y: {
           suggestedMin: 0,
           suggestedMax: 1200,
+        },
+      },
+    },
+  });
+
+  let temperatureChartAppearance = new Chart(temperatureChart, {
+    type: "line",
+    data: {
+      labels: timeArray,
+      datasets: [
+        {
+          data: temperatureArray,
+          fill: "origin",
+          backgroundColor: TEMP_CHART_BG_COLOR,
+          borderColor: TEMP_CHART_LINE_COLOR,
+          tension: 0.4,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      elements: {
+        point: {
+          pointStyle: false,
+        },
+      },
+      plugins: {
+        legend: {
+          display: false,
+        },
+      },
+      scales: {
+        x: {
+          ticks: {
+            maxTicksLimit: 5,
+          },
+        },
+        y: {
+          suggestedMin: 0,
+          suggestedMax: 100,
         },
       },
     },
@@ -297,23 +348,26 @@ function onLoad() {
 
   function motorTemperatureControl(motorOn) {
     clearInterval(temperatureControlInterval);
+    let temperatureStep = temperatureValue;
     const MIN_TEMP = 20;
     const MAX_TEMP = 80;
     if (!motorOn) {
       temperatureControlInterval = setInterval(() => {
-        if (temperatureValue <= MIN_TEMP) {
+        if (temperatureStep <= MIN_TEMP) {
           temperatureValue = MIN_TEMP;
           motorTemperature.textContent = `${temperatureValue}`;
           return;
         }
+        temperatureValue = temperatureStep;
         temperatureColorControl();
         overheatingLogic();
         motorTemperature.textContent = `${temperatureValue}`;
-        temperatureValue -= randomInt(1, 10);
-      }, 2500);
+        temperatureStep -= randomInt(1, 10);
+        if (temperatureStep < MIN_TEMP) temperatureStep = MIN_TEMP;
+      }, 3000);
     } else {
       temperatureControlInterval = setInterval(() => {
-        if (temperatureValue >= MAX_TEMP) {
+        if (temperatureStep >= MAX_TEMP) {
           temperatureValue = MAX_TEMP;
           motorTemperature.textContent = `${temperatureValue}`;
           overheated = true;
@@ -323,9 +377,10 @@ function onLoad() {
           temperatureStatusOverheated();
           return;
         }
+        temperatureValue = temperatureStep;
         temperatureColorControl();
         motorTemperature.textContent = `${temperatureValue}`;
-        temperatureValue += randomInt(1, 5);
+        temperatureStep += randomInt(1, 5);
       }, 5000);
     }
   }
@@ -338,9 +393,9 @@ function onLoad() {
       motorSpeedValue = 0;
       return;
     }
-    motorSpeedValue = 1000;
     const MIN_SPEED = 1000;
     const MAX_SPEED = 1200;
+    motorSpeedValue = MIN_SPEED;
     motorSpeed.textContent = `${motorSpeedValue}`;
     motorSpeedText.style.display = "inline";
     motorSpeedControlInterval = setInterval(() => {
@@ -544,6 +599,7 @@ function onLoad() {
   batteryCardColorControl();
   timeDataLoop();
   speedChartLoop(speedChartAppearance);
+  temperatureChartLoop(temperatureChartAppearance);
 }
 
 window.addEventListener("load", onLoad);
