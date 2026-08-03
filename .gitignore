@@ -5,5 +5,5 @@
 .env*
 !.env.example
 
-#node files
+
 node_modules/
