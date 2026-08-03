@@ -1,0 +1,25 @@
+{
+  "name": "robotsimulator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Liviu-Olteanu/RobotSimulator.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/Liviu-Olteanu/RobotSimulator/issues"
+  },
+  "homepage": "https://github.com/Liviu-Olteanu/RobotSimulator#readme",
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.8.0"
+  }
+}
