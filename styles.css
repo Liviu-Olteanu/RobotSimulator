@@ -56,6 +56,8 @@
 }
 
 .dashboard-container {
+  background-color: var(--bg-main);
+  margin: 0;
   max-width: 75rem;
   margin-inline: auto;
   padding: 2rem;
@@ -73,10 +75,6 @@
   height: auto;
   vertical-align: middle;
   margin-bottom: 0.313rem;
-}
-
-body {
-  background-color: var(--bg-main);
 }
 
 .status-cards {
@@ -104,11 +102,8 @@ body {
 .card {
   padding: 1.25rem;
   width: 100%;
-  max-width: 14rem;
-  max-width: 100%;
   border-radius: 0.75rem;
   background-color: var(--bg-card);
-
   font-size: 1rem;
   color: var(--text-main);
 }
@@ -261,13 +256,13 @@ body {
   margin-bottom: 1rem;
 }
 
-.btn-state-text {
+.control-panel__state-text {
   margin-left: 0.5rem;
   display: inline-block;
 }
 
 @media (max-width: 480px) {
-  .btn-state-text {
+  .control-panel__state-text {
     display: block;
     margin-left: 0;
     margin-top: 1rem;
