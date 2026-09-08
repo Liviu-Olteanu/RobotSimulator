@@ -242,7 +242,7 @@ function onLoad() {
 
     if (batteryCharge > LOW_BATTERY_THRESHOLD) {
       batteryChargeBanner.style.display = "none";
-    } else if (batteryCharge <= LOW_BATTERY_THRESHOLD && batteryCharge != 0) {
+    } else if (batteryCharge <= LOW_BATTERY_THRESHOLD && batteryCharge !== 0) {
       batteryChargeBanner.style.display = "block";
       batteryBannerText.textContent = MESSAGES.bannerTextWarning(batteryCharge.toFixed(1));
       batteryChargeBanner.classList.add(CLASSES.bannerStatusWarning);
@@ -259,10 +259,12 @@ function onLoad() {
     const LOW_THRESHOLD = 45;
     const HIGH_THRESHOLD = 60;
     motorTemperature.className = "card__temperature";
+
     if (temperatureValue <= LOW_THRESHOLD) {
-      motorTemperature.className = "card__temperature";
       return;
-    } else if (temperatureValue > LOW_THRESHOLD && temperatureValue <= HIGH_THRESHOLD) {
+    }
+
+    if (temperatureValue <= HIGH_THRESHOLD) {
       motorTemperature.classList.add(CLASSES.cardTemperatureMid);
     } else {
       motorTemperature.classList.add(CLASSES.cardTemperatureHigh);
@@ -286,12 +288,12 @@ function onLoad() {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
-  function motorTemperatureControl(motorOn) {
+  function motorTemperatureControl(isMotorRunning) {
     clearInterval(temperatureControlInterval);
     let temperatureStep = temperatureValue;
     const MIN_TEMP = 20;
     const MAX_TEMP = 80;
-    if (!motorOn) {
+    if (!isMotorRunning) {
       temperatureControlInterval = setInterval(() => {
         if (temperatureStep <= MIN_TEMP) {
           temperatureValue = MIN_TEMP;
@@ -325,9 +327,9 @@ function onLoad() {
     }
   }
 
-  function motorSpeedControl(motorOn) {
+  function motorSpeedControl(isMotorRunning) {
     clearInterval(motorSpeedControlInterval);
-    if (!motorOn) {
+    if (!isMotorRunning) {
       motorSpeed.textContent = `━`;
       motorSpeedText.style.display = "none";
       motorSpeedValue = 0;
@@ -350,11 +352,11 @@ function onLoad() {
     }, 3000);
   }
 
-  function batteryLevelControl(level, time) {
+  function batteryLevelControl(changePerTick, intervalMs) {
     clearInterval(batteryControlInterval);
     bannerControl();
     batteryControlInterval = setInterval(() => {
-      batteryCharge += level;
+      batteryCharge += changePerTick;
       batteryCardColorControl();
       if (batteryCharge <= 0) {
         batteryCharge = 0;
@@ -376,11 +378,11 @@ function onLoad() {
         batteryChargePercentage.textContent = `${batteryCharge.toFixed(1)}%`;
         progressBarFill.style.width = `${batteryCharge}%`;
         bannerControl();
-        if (level > 0) {
+        if (changePerTick > 0) {
           buttonStateText.textContent = MESSAGES.chargingStatus(batteryCharge.toFixed(1));
         }
       }
-    }, time);
+    }, intervalMs);
   }
 
   function stateChange(state) {
@@ -389,7 +391,7 @@ function onLoad() {
       return;
     }
     oldState = motorState;
-    motorState = MOTOR_STATES[state];
+    motorState = state;
   }
 
   function updateStatusCard() {
