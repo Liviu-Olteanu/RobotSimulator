@@ -214,6 +214,7 @@ function onLoad() {
     const CHARGED_THRESHOLD = 50;
     const LOW_THRESHOLD = 20;
 
+    // className acts as a reset, removing all previous modifier classes
     batteryChargePercentage.className = "card__battery";
     progressBarFill.className = "bar__fill";
     if (batteryCharge > CHARGED_THRESHOLD) {
@@ -275,7 +276,7 @@ function onLoad() {
     const OVERHEATING_TEMP_STOP_POINT = 40;
     if (temperatureValue <= OVERHEATING_TEMP_STOP_POINT && motorState === MOTOR_STATES.overheated) {
       isCoolingFromOverheat = false;
-      stateChange(MOTOR_STATES.stopped);
+      applyState(MOTOR_STATES.stopped);
       temperatureStateBanner.style.display = "none";
       render();
     } else if (temperatureValue <= OVERHEATING_TEMP_STOP_POINT && motorState === MOTOR_STATES.charging) {
@@ -315,7 +316,7 @@ function onLoad() {
           motorTemperature.textContent = `${temperatureValue}`;
           temperatureStateBanner.style.display = "block";
           clearInterval(temperatureControlInterval);
-          stateChange(MOTOR_STATES.overheated);
+          applyState(MOTOR_STATES.overheated);
           render();
           return;
         }
@@ -362,7 +363,7 @@ function onLoad() {
         batteryCharge = 0;
         batteryChargePercentage.textContent = `${batteryCharge}%`;
         progressBarFill.style.width = `${batteryCharge}%`;
-        stateChange(MOTOR_STATES.depleted);
+        applyState(MOTOR_STATES.depleted);
         bannerControl();
         render();
         clearInterval(batteryControlInterval);
@@ -370,8 +371,7 @@ function onLoad() {
         batteryCharge = 100;
         batteryChargePercentage.textContent = `${batteryCharge.toFixed(0)}%`;
         progressBarFill.style.width = `${batteryCharge}%`;
-        stateChange(MOTOR_STATES.stopped);
-        buttonStateText.textContent = MESSAGES.batteryFull;
+        applyState(isCoolingFromOverheat ? MOTOR_STATES.overheated : MOTOR_STATES.stopped);
         render();
         clearInterval(batteryControlInterval);
       } else {
@@ -385,13 +385,33 @@ function onLoad() {
     }, intervalMs);
   }
 
-  function stateChange(state) {
-    if (!Object.values(MOTOR_STATES).includes(state)) {
-      console.error(`Invalid state: ${state}`);
+  function applyState(newState) {
+    if (!Object.values(MOTOR_STATES).includes(newState)) {
+      console.error(`Invalid state: ${newState}`);
       return;
     }
     oldState = motorState;
-    motorState = state;
+    motorState = newState;
+
+    // Clean up behaviors from the previous state
+    if (oldState === MOTOR_STATES.running) {
+      motorSpeedControl(false);
+      motorTemperatureControl(false);
+      clearInterval(batteryControlInterval);
+    } else if (oldState === MOTOR_STATES.charging) {
+      clearInterval(batteryControlInterval);
+    }
+
+    // Start behaviors for the new state
+    if (motorState === MOTOR_STATES.running) {
+      motorSpeedControl(true);
+      motorTemperatureControl(true);
+      batteryLevelControl(-1, 10000);
+    } else if (motorState === MOTOR_STATES.charging) {
+      batteryLevelControl(+0.1, 1000);
+    } else if (motorState === MOTOR_STATES.overheated) {
+      isCoolingFromOverheat = true;
+    }
   }
 
   function updateStatusCard() {
@@ -439,11 +459,11 @@ function onLoad() {
       return;
     }
     if (batteryCharge === 0) {
-      stateChange(MOTOR_STATES.depleted);
+      applyState(MOTOR_STATES.depleted);
     } else if (motorState === MOTOR_STATES.running) {
-      stateChange(MOTOR_STATES.stopped);
+      applyState(MOTOR_STATES.stopped);
     } else if (motorState === MOTOR_STATES.stopped) {
-      stateChange(MOTOR_STATES.running);
+      applyState(MOTOR_STATES.running);
     } else {
       console.warn("No valid motor states found while toggling motor");
     }
@@ -456,48 +476,21 @@ function onLoad() {
       return;
     }
     if (motorState === MOTOR_STATES.charging && isCoolingFromOverheat) {
-      stateChange(MOTOR_STATES.overheated);
+      applyState(MOTOR_STATES.overheated);
     } else if (
       motorState === MOTOR_STATES.stopped ||
       motorState === MOTOR_STATES.overheated ||
       motorState === MOTOR_STATES.depleted
     ) {
-      stateChange(MOTOR_STATES.charging);
+      applyState(MOTOR_STATES.charging);
     } else if (batteryCharge <= 0 && motorState === MOTOR_STATES.charging) {
-      stateChange(MOTOR_STATES.depleted);
+      applyState(MOTOR_STATES.depleted);
     } else if (motorState === MOTOR_STATES.charging) {
-      stateChange(MOTOR_STATES.stopped);
+      applyState(MOTOR_STATES.stopped);
     } else {
       console.warn("No valid motor states found while toggling charge");
     }
     render();
-  }
-
-  function chargingActions() {
-    buttonStateText.textContent = MESSAGES.chargingStatus(batteryCharge.toFixed(1));
-    chargeButton.textContent = MESSAGES.btnStopCharging;
-    chargeButton.classList.add(CLASSES.chargeCharging);
-    batteryLevelControl(+0.1, 1000);
-  }
-
-  function chargingToStoppedChanges() {
-    clearInterval(batteryControlInterval);
-  }
-
-  function runningToStoppedChanges() {
-    motorSpeedControl(false);
-    motorTemperatureControl(false);
-    clearInterval(batteryControlInterval);
-  }
-
-  function stoppedToRunningChanges() {
-    controlButton.className = "btn";
-    controlButton.classList.add("js-motor-btn", CLASSES.motorStop);
-    motorSpeedControl(true);
-    motorTemperatureControl(true);
-    controlButton.textContent = MESSAGES.btnStopMotor;
-    batteryLevelControl(-1, 10000);
-    buttonStateText.textContent = MESSAGES.motorRunning;
   }
 
   function baseMotorStop() {
@@ -530,40 +523,34 @@ function onLoad() {
     updateStatusCard();
     if (motorState === MOTOR_STATES.stopped) {
       baseMotorStop();
-      if (oldState === MOTOR_STATES.charging) {
-        chargingToStoppedChanges();
-      } else if (oldState === MOTOR_STATES.running) {
-        runningToStoppedChanges();
+      if (batteryCharge >= 100) {
+        buttonStateText.textContent = MESSAGES.batteryFull;
       }
     } else if (motorState === MOTOR_STATES.running) {
       controlButton.disabled = false;
       chargeButton.disabled = true;
-      stoppedToRunningChanges();
+      // className acts as a reset, removing all previous modifier classes
+      controlButton.className = "btn";
+      controlButton.classList.add("js-motor-btn", CLASSES.motorStop);
+      controlButton.textContent = MESSAGES.btnStopMotor;
+      buttonStateText.textContent = MESSAGES.motorRunning;
     } else if (motorState === MOTOR_STATES.charging) {
       controlButton.disabled = true;
       chargeButton.disabled = false;
       chargeButton.className = "btn";
-      chargeButton.classList.add("js-charge-btn");
-      chargingActions();
+      chargeButton.classList.add("js-charge-btn", CLASSES.chargeCharging);
+      chargeButton.textContent = MESSAGES.btnStopCharging;
+      buttonStateText.textContent = MESSAGES.chargingStatus(batteryCharge.toFixed(1));
     } else if (motorState === MOTOR_STATES.depleted) {
       baseMotorStop();
-      runningToStoppedChanges();
       controlButton.disabled = true;
       chargeButton.disabled = false;
       buttonStateText.textContent = MESSAGES.batteryDepleted;
-      if (oldState === MOTOR_STATES.charging) {
-        chargingToStoppedChanges();
-      }
     } else if (motorState === MOTOR_STATES.overheated) {
       baseMotorStop();
-      runningToStoppedChanges();
       controlButton.disabled = true;
       chargeButton.disabled = false;
       buttonStateText.textContent = MESSAGES.motorOverheated;
-      isCoolingFromOverheat = true;
-      if (oldState === MOTOR_STATES.charging) {
-        chargingToStoppedChanges();
-      }
     } else {
       console.log("No valid motor states were found");
     }
