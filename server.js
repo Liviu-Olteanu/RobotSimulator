@@ -1,7 +1,16 @@
 import express from "express";
+import { JSONFilePreset } from "lowdb/node";
 
 const app = express();
 const PORT = 3000;
+const db = await JSONFilePreset("db.json", {
+  motorState: "stopped",
+  oldState: null,
+  isCoolingFromOverheat: false,
+  batteryCharge: 70.0,
+  motorSpeedValue: 0,
+  temperatureValue: 20,
+});
 
 const MOTOR_STATES = {
   stopped: "stopped",
@@ -11,23 +20,52 @@ const MOTOR_STATES = {
   depleted: "depleted",
 };
 
-let oldState = null;
-let motorState = MOTOR_STATES.stopped;
 let temperatureValue = 20;
+let motorSpeedValue = 0;
+let batteryCharge = 70.0;
+let motorState = MOTOR_STATES.stopped;
+let oldState = null;
 let temperatureStep = temperatureValue;
 let temperatureArray = new Array(30).fill(20);
 let temperatureControlInterval = null;
-let motorSpeedValue = 0;
 let motorSpeedArray = new Array(30).fill(0);
 let motorSpeedControlInterval = null;
-let batteryCharge = 70.0;
 let batteryControlInterval = null;
 let timeArray = [];
 let isCoolingFromOverheat = false;
 
+function initialiseValues() {
+  if (!db) {
+    console.log("No database has been found.");
+  } else {
+    oldState = db.data.oldState;
+    isCoolingFromOverheat = db.data.isCoolingFromOverheat;
+    temperatureValue = db.data.temperatureValue;
+    motorSpeedValue = db.data.motorSpeedValue;
+    batteryCharge = db.data.batteryCharge;
+    motorState = db.data.motorState;
+    applyState(motorState);
+    if (temperatureValue > 20 && motorState !== MOTOR_STATES.running) motorTemperatureControl(false);
+  }
+}
+
+function saveData() {
+  setInterval(async () => {
+    db.data.oldState = oldState;
+    db.data.isCoolingFromOverheat = isCoolingFromOverheat;
+    db.data.temperatureValue = temperatureValue;
+    db.data.motorSpeedValue = motorSpeedValue;
+    db.data.batteryCharge = batteryCharge;
+    db.data.motorState = motorState;
+    await db.write();
+  }, 5000);
+}
+
 function init() {
+  initialiseValues();
   fillDateArray();
   chartsDataLoop();
+  saveData();
 }
 
 function chartsDataLoop() {
