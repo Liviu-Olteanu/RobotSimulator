@@ -78,9 +78,9 @@ function onLoad() {
   const TEMP_CHART_COLOR_OPACITY = "15";
   const TEMP_CHART_BG_COLOR = TEMP_CHART_LINE_COLOR + TEMP_CHART_COLOR_OPACITY;
   let motorState = MOTOR_STATES.stopped;
-  let batteryCharge = "-";
-  let temperatureValue = "-";
-  let motorSpeedValue = "-";
+  let batteryCharge = null;
+  let temperatureValue = null;
+  let motorSpeedValue = null;
   let temperatureArray = [];
   let motorSpeedArray = [];
   let timeArray = [];
@@ -464,12 +464,8 @@ function onLoad() {
   function init() {
     getDataLoop();
     initCharts();
+    fetchAndUpdate();
     render();
-    batteryChargePercentage.textContent = `${batteryCharge.toFixed(1)}%`;
-    progressBarFill.style.width = `${batteryCharge}%`;
-    motorTemperature.textContent = `${temperatureValue}`;
-    bannerControl();
-    batteryCardColorControl();
   }
 
   function render() {
