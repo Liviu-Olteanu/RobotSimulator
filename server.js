@@ -2,8 +2,8 @@ import express from "express";
 import { JSONFilePreset } from "lowdb/node";
 
 const app = express();
-const PORT = 3000;
-const db = await JSONFilePreset("db.json", {
+const PORT = process.env.PORT || 3000;
+const db = await JSONFilePreset(process.env.DB_PATH || "db.json", {
   motorState: "stopped",
   oldState: null,
   isCoolingFromOverheat: false,
