@@ -1,10 +1,11 @@
 import globals from "globals";
 import js from "@eslint/js";
+import pluginVue from "eslint-plugin-vue";
 
 export default [
   js.configs.recommended,
   {
-    files: ["public/**/*.js"],
+    files: ["public/**/*.js", "client/src/**/*.vue", "client/src/**/*.js"],
     languageOptions: {
       ecmaVersion: "latest",
       sourceType: "module",
@@ -42,5 +43,9 @@ export default [
       semi: ["error", "always"],
       "no-unused-vars": "error",
     },
+  },
+  ...pluginVue.configs["flat/recommended"],
+  {
+    ignores: ["client/dist/**"],
   },
 ];
